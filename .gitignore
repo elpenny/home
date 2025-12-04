@@ -1,0 +1,24 @@
+# Ignore every directory by default; only top-level files are tracked unless explicitly whitelisted
+*/
+
+.aws
+.azure
+.cache
+.config
+.docker
+.npm
+.nvm
+.ssh
+.vscode-server
+
+.bash_history
+.node_repl_history
+.lesshst
+.motd_shown
+.sudo_as_admin_successful
+
+.local/*
+!.local/bin
+.local/bin/*
+!.local/bin/env
+.codex/
