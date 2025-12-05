@@ -24,3 +24,12 @@
 .codex/
 !scripts/
 .claude.json.backup
+.claude.json
+
+.shell.pre-oh-my-zsh
+.wget-hsts
+.zcompdump
+.zcompdump-Main-Desktop-5.9
+.zcompdump-Main-Desktop-5.9.zwc
+.zsh_history
+.zshrc.pre-oh-my-zsh
