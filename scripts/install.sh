@@ -43,13 +43,48 @@ install_base_packages() {
 }
 
 install_powerlevel10k() {
-    local target="$HOME/.local/share/powerlevel10k"
+    local custom_root="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+    local target="$custom_root/themes/powerlevel10k"
+    local legacy="$HOME/.local/share/powerlevel10k"
+
+    if [ ! -d "$target" ] && [ -d "$legacy/.git" ]; then
+        mkdir -p "$(dirname "$target")"
+        ln -snf "$legacy" "$target"
+    fi
+
     if [ -d "$target/.git" ]; then
         git -C "$target" pull --ff-only
     else
         mkdir -p "$(dirname "$target")"
         git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$target"
     fi
+}
+
+install_oh_my_zsh() {
+    if [ -d "$HOME/.oh-my-zsh" ]; then
+        echo "oh-my-zsh already installed"
+        return 0
+    fi
+
+    RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+}
+
+ensure_zshrc() {
+    if [ -f "$HOME/.zshrc" ]; then
+        echo "Existing .zshrc detected; ensure it sources oh-my-zsh and powerlevel10k if desired"
+        return 0
+    fi
+
+    cat >"$HOME/.zshrc" <<'EOF'
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME="powerlevel10k/powerlevel10k"
+plugins=(git)
+
+source "$ZSH/oh-my-zsh.sh"
+
+[[ -r "$HOME/.p10k.zsh" ]] && source "$HOME/.p10k.zsh"
+EOF
 }
 
 install_nvm() {
@@ -96,7 +131,9 @@ main() {
 
     install_base_packages "$pm"
     ensure_local_env
+    install_oh_my_zsh
     install_powerlevel10k
+    ensure_zshrc
     install_nvm
     install_uv
     maybe_set_default_shell
