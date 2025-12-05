@@ -22,3 +22,5 @@
 .local/bin/*
 !.local/bin/env
 .codex/
+!scripts/
+.claude.json.backup
