@@ -92,7 +92,7 @@ install_nvm() {
         echo "nvm already installed"
         return 0
     fi
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
 }
 
 install_uv() {
