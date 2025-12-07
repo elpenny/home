@@ -103,6 +103,14 @@ install_uv() {
     curl -LsSf https://astral.sh/uv/install.sh | sh
 }
 
+install_claude_code() {
+    if command_exists claude; then
+        echo "Claude Code already installed"
+        return 0
+    fi
+    curl -fsSL https://claude.ai/install.sh | bash
+}
+
 ensure_local_env() {
     mkdir -p "$HOME/.local/bin"
     if [ -f "$REPO_DIR/.local/bin/env" ]; then
@@ -136,9 +144,10 @@ main() {
     ensure_zshrc
     install_nvm
     install_uv
+    install_claude_code
     maybe_set_default_shell
 
-    echo "Bootstrap complete. Start a new shell to load zsh + powerlevel10k + nvm + uv."
+    echo "Bootstrap complete. Start a new shell to load zsh + powerlevel10k + nvm + uv + claude."
 }
 
 main "$@"
