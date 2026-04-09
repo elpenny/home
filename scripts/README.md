@@ -34,9 +34,18 @@ Usage:
 
 ```bash
 ./scripts/bootstrap-extra.sh
+./scripts/bootstrap-extra.sh --codex
+./scripts/bootstrap-extra.sh --uv --claude
 ```
 
-If `npm` is not already available, the script installs a Node.js LTS release through `nvm` before installing Codex.
+Available flags:
+
+- `--nvm`
+- `--uv`
+- `--claude`
+- `--codex`
+
+With no flags, the script installs all extras. If `npm` is not already available, installing Codex first installs a Node.js LTS release through `nvm`.
 
 ## `dotnet-install.sh`
 
