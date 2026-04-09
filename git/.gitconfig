@@ -1,0 +1,14 @@
+[user]
+	email = mikolaj.kubista@gmail.com
+	name = Mikołąj Kubista
+[init]
+	defaultBranch = main
+[core]
+	autocrlf = true
+	excludesfile = ~/.config/git/ignore
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
+	line-numbers = true
+	side-by-side = false

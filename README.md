@@ -1,24 +1,78 @@
 # Home Dotfiles
 
-Personal Linux setup for zsh + powerlevel10k with nvm and uv. The repo is intended to live at `~` so tracked files land directly in the home directory.
+Personal Linux and WSL shell setup managed from a normal git repo with GNU `stow`.
+
+## Layout
+
+Keep the repo outside of `$HOME`, for example:
+
+```bash
+git clone https://github.com/elpenny/home.git ~/repositories/home
+cd ~/repositories/home
+```
+
+Tracked files are grouped into `stow` packages:
+
+- `bash/`
+- `claude/`
+- `git/`
+- `shell/`
+- `starship/`
+- `zsh/`
+
+Applying a package creates symlinks into `$HOME`.
 
 ## Bootstrap
-- Run `./install.sh` from this directory. It will install zsh, powerlevel10k, nvm, and uv, copy the shared `~/.local/bin/env`, and switch your login shell to zsh (set `SKIP_CHSH=1` to skip).
-- Start a new terminal after the script finishes so zsh loads the new config.
 
-## Fresh machine workflow
-If you want to keep the repo directly on `$HOME`, clone it as a bare/separate git dir to avoid conflicts with existing files:
-```
-REPO_URL=<your-remote-url>
-git clone --separate-git-dir=$HOME/.home-git "$REPO_URL" $HOME/.home-tmp
-cp -a $HOME/.home-tmp/. $HOME/
-rm -rf $HOME/.home-tmp
-alias home='git --git-dir=$HOME/.home-git --work-tree=$HOME'
-home checkout
-home config status.showUntrackedFiles no
-```
-Afterwards, run `./install.sh`.
+Core shell and CLI setup:
 
-## Notes
-- `.gitignore` intentionally excludes credential-bearing locations (e.g., `.ssh/`, `.aws/`, `.config/`) and caches.
-- zsh sources `~/.local/bin/env`, nvm, and powerlevel10k if present. Customize the prompt by editing `~/.p10k.zsh` or running `p10k configure`.
+```bash
+./scripts/bootstrap-core.sh
+```
+
+Optional extra dev tooling:
+
+```bash
+./scripts/bootstrap-extra.sh
+```
+
+`bootstrap-core.sh` installs the shell baseline, installs `starship`, and runs `stow` to link the managed files into `$HOME`.
+`bootstrap-extra.sh` installs optional tools including `nvm`, `uv`, Claude Code, and OpenAI Codex. If `npm` is not already available, it installs a Node.js LTS release through `nvm` first.
+
+## Manual Stow Usage
+
+Apply everything:
+
+```bash
+stow --dir "$HOME/repositories/home" --target "$HOME" bash shell git zsh starship claude
+```
+
+Remove a package:
+
+```bash
+stow --dir "$HOME/repositories/home" --target "$HOME" --delete zsh
+```
+
+## Managed Baseline
+
+- `zsh` with `starship`
+- modern CLI defaults when installed: `eza`, `bat`, `zoxide`, `fzf`, `fd`, `rg`, `delta`, `direnv`
+- shared PATH handling in `~/.local/bin/env`
+- shared git config and ignore rules
+
+The shell config is defensive: optional tools are only initialized when present.
+
+## Machine-Local Overrides
+
+Keep machine-specific tweaks out of git.
+
+- Put shell-only overrides in `~/.zshrc.local`
+- Keep secrets and credentials in untracked locations like `~/.ssh/`, `~/.aws/`, and Windows-mounted paths
+- If needed, add `~/.gitconfig.local` manually and include it from your local machine-specific setup
+
+Examples of local-only content:
+
+- Google Cloud SDK paths
+- WSL-only mount points
+- experimental aliases
+- credentials and tokens
