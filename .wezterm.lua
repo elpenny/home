@@ -5,24 +5,14 @@ local config = wezterm.config_builder()
 local wsl_domains = wezterm.default_wsl_domains()
 local windows_powershell = 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe'
 
+local function windows_powershell_args()
+  return { windows_powershell, '-NoLogo', '-ExecutionPolicy', 'Bypass' }
+end
+
 for _, domain in ipairs(wsl_domains) do
   if domain.name == 'WSL:Ubuntu' then
     domain.default_cwd = '~'
   end
-end
-
-local function basename(path)
-  if not path or path == '' then
-    return nil
-  end
-
-  local normalized = path:gsub('/+$', '')
-  local name = normalized:match('([^/\\]+)$')
-  if name and name ~= '' then
-    return name
-  end
-
-  return normalized
 end
 
 local function shell_args_for_process(process_name)
@@ -37,7 +27,7 @@ local function shell_args_for_process(process_name)
   end
 
   if normalized:match('/powershell%.exe$') then
-    return { process_name, '-NoLogo' }
+    return { process_name, '-NoLogo', '-ExecutionPolicy', 'Bypass' }
   end
 
   if normalized:match('/cmd%.exe$') then
@@ -64,32 +54,8 @@ local function smart_split(direction)
   end)
 end
 
-wezterm.on('format-tab-title', function(tab)
-  local pane = tab.active_pane
-  local cwd_uri
-
-  if pane then
-    if type(pane.get_current_working_dir) == 'function' then
-      cwd_uri = pane:get_current_working_dir()
-    else
-      cwd_uri = pane.current_working_dir
-    end
-  end
-
-  if cwd_uri then
-    local cwd = type(cwd_uri) == 'userdata' and cwd_uri.file_path or tostring(cwd_uri)
-    local dir = basename(cwd)
-    if dir then
-      return dir
-    end
-  end
-
-  return pane and pane.title or tab.tab_title
-end)
-
 config.wsl_domains = wsl_domains
 config.default_domain = 'WSL:Ubuntu'
-config.default_prog = { windows_powershell, '-NoLogo' }
 config.launch_menu = {
   {
     label = 'Ubuntu',
@@ -97,14 +63,8 @@ config.launch_menu = {
   },
   {
     label = 'Windows PowerShell',
-    args = {
-      windows_powershell,
-      '-NoLogo',
-    },
-  },
-  {
-    label = 'PowerShell 7',
-    args = { 'pwsh.exe', '-NoLogo' },
+    domain = { DomainName = 'local' },
+    args = windows_powershell_args(),
   },
 }
 
@@ -119,7 +79,6 @@ config.keys = {
 
 config.font = wezterm.font 'CaskaydiaCove Nerd Font'
 config.font_size = 11.0
-
 config.color_scheme = 'Tokyo Night'
 config.window_background_opacity = 0.92
 
