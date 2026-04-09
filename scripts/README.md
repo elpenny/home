@@ -28,12 +28,15 @@ Installs optional heavier developer tooling:
 - `nvm`
 - `uv`
 - Claude Code
+- OpenAI Codex
 
 Usage:
 
 ```bash
 ./scripts/bootstrap-extra.sh
 ```
+
+If `npm` is not already available, the script installs a Node.js LTS release through `nvm` before installing Codex.
 
 ## `dotnet-install.sh`
 
