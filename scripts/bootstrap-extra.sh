@@ -3,8 +3,69 @@ set -euo pipefail
 
 [ "${DEBUG:-0}" -ne 0 ] && set -x
 
+INSTALL_NVM=0
+INSTALL_UV=0
+INSTALL_CLAUDE=0
+INSTALL_CODEX=0
+
 command_exists() {
     command -v "$1" >/dev/null 2>&1
+}
+
+usage() {
+    cat <<'EOF'
+Usage: ./scripts/bootstrap-extra.sh [options]
+
+Install optional developer tooling. With no options, installs all extras.
+
+Options:
+  --nvm       Install nvm
+  --uv        Install uv
+  --claude    Install Claude Code
+  --codex     Install OpenAI Codex
+  -h, --help  Show this help text
+EOF
+}
+
+enable_all_installs() {
+    INSTALL_NVM=1
+    INSTALL_UV=1
+    INSTALL_CLAUDE=1
+    INSTALL_CODEX=1
+}
+
+parse_args() {
+    if [ "$#" -eq 0 ]; then
+        enable_all_installs
+        return 0
+    fi
+
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            --nvm)
+                INSTALL_NVM=1
+                ;;
+            --uv)
+                INSTALL_UV=1
+                ;;
+            --claude)
+                INSTALL_CLAUDE=1
+                ;;
+            --codex)
+                INSTALL_CODEX=1
+                ;;
+            -h|--help)
+                usage
+                exit 0
+                ;;
+            *)
+                echo "Unknown option: $1" >&2
+                usage >&2
+                exit 1
+                ;;
+        esac
+        shift
+    done
 }
 
 load_nvm() {
@@ -71,10 +132,23 @@ install_codex() {
 }
 
 main() {
-    install_nvm
-    install_uv
-    install_claude_code
-    install_codex
+    parse_args "$@"
+
+    if [ "$INSTALL_NVM" -eq 1 ] || [ "$INSTALL_CODEX" -eq 1 ]; then
+        install_nvm
+    fi
+
+    if [ "$INSTALL_UV" -eq 1 ]; then
+        install_uv
+    fi
+
+    if [ "$INSTALL_CLAUDE" -eq 1 ]; then
+        install_claude_code
+    fi
+
+    if [ "$INSTALL_CODEX" -eq 1 ]; then
+        install_codex
+    fi
 
     echo "Extra bootstrap complete."
 }
