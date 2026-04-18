@@ -14,7 +14,6 @@ cd ~/repositories/home
 Tracked files are grouped into `stow` packages:
 
 - `bash/`
-- `claude/`
 - `git/`
 - `shell/`
 - `starship/`
@@ -46,7 +45,7 @@ Optional extra dev tooling:
 Apply everything:
 
 ```bash
-stow --dir "$HOME/repositories/home" --target "$HOME" bash shell git zsh starship claude
+stow --dir "$HOME/repositories/home" --target "$HOME" bash shell git zsh starship
 ```
 
 Remove a package:
