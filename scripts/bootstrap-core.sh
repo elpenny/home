@@ -68,6 +68,35 @@ install_starship() {
     curl -fsSL https://starship.rs/install.sh | sh -s -- -y
 }
 
+backup_stow_conflicts() {
+    local backup_root="$HOME/.bootstrap-core-backup/$(date +%Y%m%d-%H%M%S)"
+    local package
+    local source
+    local rel_path
+    local target
+    local backup_path
+    local moved=0
+
+    for package in "$@"; do
+        while IFS= read -r source; do
+            rel_path="${source#"$REPO_DIR/$package/"}"
+            target="$HOME/$rel_path"
+
+            if [ -e "$target" ] && [ ! -L "$target" ]; then
+                backup_path="$backup_root/$rel_path"
+                mkdir -p "$(dirname "$backup_path")"
+                mv "$target" "$backup_path"
+                printf 'Moved existing %s to %s\n' "$target" "$backup_path"
+                moved=1
+            fi
+        done < <(find "$REPO_DIR/$package" -type f -o -type l)
+    done
+
+    if [ "$moved" -eq 1 ]; then
+        echo "Backed up conflicting files under $backup_root"
+    fi
+}
+
 apply_stow() {
     local packages=()
     local package
@@ -88,6 +117,7 @@ apply_stow() {
         exit 1
     fi
 
+    backup_stow_conflicts "${packages[@]}"
     stow --dir "$REPO_DIR" --target "$HOME" "${packages[@]}"
 }
 
@@ -105,4 +135,6 @@ main() {
     echo "Core bootstrap complete. Start a new shell or run: exec zsh -l"
 }
 
-main "$@"
+if [ "${BASH_SOURCE[0]}" = "$0" ]; then
+    main "$@"
+fi
