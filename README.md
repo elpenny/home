@@ -39,6 +39,7 @@ Optional extra dev tooling:
 
 `bootstrap-core.sh` installs the shell baseline, installs `starship`, and runs `stow` to link the managed files into `$HOME`.
 `bootstrap-extra.sh` installs optional tools including `nvm`, `uv`, Claude Code, and OpenAI Codex. With no flags it installs all extras; pass flags to install only selected tools. If `npm` is not already available, installing Codex will first install a Node.js LTS release through `nvm`.
+On first run, if Ubuntu or an earlier setup already created files like `.bashrc` or `.gitconfig`, `bootstrap-core.sh` moves those conflicts into `~/.bootstrap-core-backup/<timestamp>/` before applying symlinks.
 
 ## Manual Stow Usage
 
