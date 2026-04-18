@@ -69,13 +69,26 @@ install_starship() {
 }
 
 apply_stow() {
+    local packages=()
+    local package
+
     command_exists stow || {
         echo "stow is required but not installed" >&2
         exit 1
     }
 
     mkdir -p "$HOME/.config" "$HOME/.local/bin"
-    stow --dir "$REPO_DIR" --target "$HOME" bash shell git zsh starship claude
+
+    for package in bash shell git zsh starship claude; do
+        [ -d "$REPO_DIR/$package" ] && packages+=("$package")
+    done
+
+    if [ "${#packages[@]}" -eq 0 ]; then
+        echo "No stow packages found in $REPO_DIR" >&2
+        exit 1
+    fi
+
+    stow --dir "$REPO_DIR" --target "$HOME" "${packages[@]}"
 }
 
 main() {
